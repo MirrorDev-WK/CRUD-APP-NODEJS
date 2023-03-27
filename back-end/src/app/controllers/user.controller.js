@@ -48,7 +48,7 @@ exports.findOne = (req, res) => {
 };
 
 exports.update = (req, res) => {
-    const updateId = req.params.userId;
+    const userId = { _id: req.params.userId }
     const contentUpdate = {
         $set: {
             name: req.body.name,
@@ -57,9 +57,8 @@ exports.update = (req, res) => {
         }
 
     }
-    User.updateOne({ _id: updateId }, { contentUpdate })
-        .then(user => {
-            console.log(user)
+    User.updateOne(userId, contentUpdate)
+        .then(result => {
             res.send({
                 message: 'User updated successfully'
             });
@@ -72,8 +71,12 @@ exports.update = (req, res) => {
 
 exports.delete = (req, res) => {
     User.deleteOne({ _id: req.params.userId })
-        .then(user => {
-            res.send(user);
+        .then(result => {
+            result.deletedCount > 0 ? res.send({
+                message: 'Deleted successfully'
+            }) : res.send({
+                message: 'Do nothing was deleted successfully'
+            })
         }).catch(err => {
             res.status(500).send({
                 message: err.message || 'Some error occurred while deleting users.'
